@@ -4,6 +4,11 @@
 import argparse
 import collections
 import s3utils
+from tensorflow.core.example import example_pb2
+import struct
+
+SENTENCE_START = '<s>'
+SENTENCE_END = '</s>'
 
 def count_num(fname):
     count = 0
@@ -12,15 +17,23 @@ def count_num(fname):
             count += 1
     return count
 
+def get_art_abs(source, target):
+    with open(source) as sf, open(target) as tf:
+        for src, tgt in zip(sf, tf):
+            src = src[:-1]
+            tgt = tgt[:-1]
+            yield src, tgt
+
 def write_to_bin(source, target, vocab_path, out_file):
     num_stories = count_num(source)
-    vocab_cunter = collections.Counter()
-    with open(out_fname, 'wb') as writer:
+    vocab_counter = collections.Counter()
+    with open(out_file, 'wb') as writer:
+        gen = get_art_abs(source, target)
         for idx in range(num_stories):
             if idx % 1000 == 0:
                 print("Writing story %i of %i; %.2f percent done" %
                       (idx, num_stories, float(idx)*100.0/float(num_stories)))
-            article, abstract = get_art_abs(source, target)
+            article, abstract = next(gen)
             tf_example = example_pb2.Example()
             tf_example.features.feature['article'].bytes_list.value.extend([bytes(article, 'utf-8')])
             tf_example.features.feature['abstract'].bytes_list.value.extend([bytes(abstract, 'utf-8')])
