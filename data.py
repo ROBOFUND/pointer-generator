@@ -21,6 +21,7 @@ import random
 import struct
 import csv
 from tensorflow.core.example import example_pb2
+from smart_open import smart_open
 
 # <s> and </s> are used in the data files to segment the abstracts into sentences. They don't receive vocab ids.
 SENTENCE_START = '<s>'
@@ -54,7 +55,7 @@ class Vocab(object):
       self._count += 1
 
     # Read the vocab file and add words up to max_size
-    with open(vocab_file, 'r') as vocab_f:
+    with smart_open(vocab_file, 'r') as vocab_f:
       for line in vocab_f:
         pieces = line.split()
         if len(pieces) != 2:
@@ -122,14 +123,17 @@ def example_generator(data_path, single_pass):
     Deserialized tf.Example.
   """
   while True:
-    filelist = glob.glob(data_path) # get the list of datafiles
-    assert filelist, ('Error: Empty filelist at %s' % data_path) # check filelist isn't empty
+    if data_path.startswith('s3://'):
+      filelist = [data_path]
+    else:
+      filelist = glob.glob(data_path) # get the list of datafiles
+      assert filelist, ('Error: Empty filelist at %s' % data_path) # check filelist isn't empty
     if single_pass:
       filelist = sorted(filelist)
     else:
       random.shuffle(filelist)
     for f in filelist:
-      reader = open(f, 'rb')
+      reader = smart_open(f, 'rb')
       while True:
         len_bytes = reader.read(8)
         if not len_bytes: break # finished reading this file
