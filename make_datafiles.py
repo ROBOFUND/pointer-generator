@@ -3,7 +3,6 @@
 
 import argparse
 import collections
-import s3utils
 from tensorflow.core.example import example_pb2
 import struct
 
