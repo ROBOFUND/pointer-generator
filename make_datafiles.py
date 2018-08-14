@@ -20,7 +20,7 @@ def get_art_abs(source, target):
     with open(source) as sf, open(target) as tf:
         for src, tgt in zip(sf, tf):
             src = src[:-1]
-            tgt = tgt[:-1]
+            tgt = "%s %s %s" % (SENTENCE_START, tgt[:-1], SENTENCE_END)
             yield src, tgt
 
 def write_to_bin(source, target, vocab_path, out_file):
