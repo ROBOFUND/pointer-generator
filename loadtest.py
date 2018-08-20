@@ -30,6 +30,10 @@ def main():
     }
     hps = collections.namedtuple('hps', _hps.keys())(**_hps)
     batcher = Batcher(args.data_path, vocab, hps, args.single_pass)
+    import pdb; pdb.set_trace()
+    x = batcher.next_batch()
+    import pdb; pdb.set_trace()
+    pass
 
 if __name__ == '__main__':
     main()
