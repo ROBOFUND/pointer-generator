@@ -24,17 +24,31 @@ def get_args():
     args = p.parse_args()
     return args
 
-def main():
-    args = get_args()
-    vocab = Vocab(args.vocab_path, args.vocab_size) # create a vocabulary
+def get_hps():
     _hps = {
         'batch_size': 1, # 10
         'mode': 'decode',
+        'lr': 0.15,
+        'adagrad_init_acc': 0.1,
+        'rand_unif_init_mag': 0.02,
+        'trunc_norm_init_std': 1e-4,
+        'max_grad_norm': 2.0,
+        'hidden_dim': 256,
+        'emb_dim': 128,
         'max_enc_steps': 400,
         'max_dec_steps': 100,
+        'coverage': False,
+        'cov_loss_wt': 1.0,
         'pointer_gen': True,
+        'beam_size': 1,
     }
     hps = collections.namedtuple('hps', _hps.keys())(**_hps)
+    return hps
+
+def main():
+    args = get_args()
+    vocab = Vocab(args.vocab_path, args.vocab_size) # create a vocabulary
+    hps = get_hps()
     if not args.data_path == "":
         batcher = Batcher(args.data_path, vocab, hps, args.single_pass)
         import pdb; pdb.set_trace()
