@@ -28,7 +28,7 @@ def main():
     args = get_args()
     vocab = Vocab(args.vocab_path, args.vocab_size) # create a vocabulary
     _hps = {
-        'batch_size': 10,
+        'batch_size': 1, # 10
         'mode': 'decode',
         'max_enc_steps': 400,
         'max_dec_steps': 100,
@@ -50,6 +50,7 @@ def main():
         parsed_article = m.parse(article)
         abs_words = m.parse(abstract).split()
         ex = B.Example(parsed_article, abs_words, vocab, hps)
+        b = B.Batch([ex], hps, vocab)
         import pdb; pdb.set_trace()
         pass
 
